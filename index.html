@@ -6,7 +6,7 @@
     <title>ReChat</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;500&display=swap" rel="stylesheet">
-    <link href="resources/logo.png" rel="icon">
+    <link href="resources/logo-dark.png" rel="icon">
 
     <!-- Firebase Dependencies -->
     <script src="https://www.gstatic.com/firebasejs/7.23.0/firebase-app.js"></script>
@@ -48,6 +48,19 @@
         margin: 0px;
         line-height: 50px;
         font-weight: 900;
+        flex-grow: 1;
+      }
+      .header-options {
+        display: flex;
+      }
+      .header-options img {
+        width: 44px;
+        height: 44px;
+        border-radius: 100%;
+        border: 3px solid rgb(255, 255, 255);
+      }
+      .header-options img:hover {
+        cursor: pointer;
       }
 
       .content {
@@ -142,6 +155,9 @@
     <div class="header">
       <img class="header-logo" src="resources/logo.png">
       <h1 class="header-text">ReChat</h1>
+      <div class="header-options">
+        <img class="account-image" src="resources/account.png">
+      </div>
     </div>
 
     <div class="content">
@@ -209,6 +225,7 @@
           console.log(result);
           console.log(token);
           console.log(user);
+          document.getElementsByClassName("account-image")[0].src = user.photoURL;
         } else { // Signed out
           toggle(document.getElementsByClassName("account-login")[0], "popup-active");
           toggle(document.getElementsByClassName("cover")[0], "cover-active");
