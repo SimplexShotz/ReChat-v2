@@ -264,7 +264,7 @@
 
           document.getElementsByClassName("account-image")[0].src = userData.photoURL;
           document.getElementsByClassName("account-name")[0].innerText = userData.displayName;
-          ref.users.child(userData.uid).once(function(data) {
+          ref.users.child(userData.uid).once("value", function(data) {
             let d = data.val();
             if (d === null) {
               let importantData = {
