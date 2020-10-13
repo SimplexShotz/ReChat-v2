@@ -145,7 +145,7 @@
         width: 60%;
         padding: 10px;
       }
-      .popup button.logout-confirm {
+      .popup button.confirm {
         background-color: rgb(15, 125, 210);
         color: rgb(255, 255, 255);
       }
@@ -156,10 +156,27 @@
       .popup button:active {
         background-color: rgb(240, 240, 240);
       }
-      .popup button.logout-confirm:active {
+      .popup button.confirm:active {
         background-color: rgb(0, 110, 195);
       }
       .popup button:focus {
+        outline: none;
+      }
+      .popup input {
+        display: none;
+        width: 60%;
+        padding: 15px 25px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0px 0px 5px 5px rgba(200, 200, 200, 0.25);
+        font-size: 12pt;
+        transition: box-shadow 0.5s;
+      }
+      .popup input:hover {
+        box-shadow: 0px 0px 5px 5px rgba(200, 200, 200, 0.5);
+      }
+      .popup input:focus {
         outline: none;
       }
 
@@ -194,17 +211,27 @@
     <div class="popup account-login">
       <h1 class="popup-title">You're Not Logged In.</h1>
       <p class="popup-text">Please choose a login option below.</p>
-      <button class="login-google" onclick="login('Google')"><img src="resources/logo-google.png">Login with Google</button>
+      <button onclick="login('Google')"><img src="resources/logo-google.png">Login with Google</button>
       <!-- <div class="spacer-vertical"></div> -->
-      <!-- <button class="login-dragon" onclick="login('Dragon')"><img src="resources/logo-dragon.png">Login with Dragon</button> -->
+      <!-- <button onclick="login('Dragon')"><img src="resources/logo-dragon.png">Login with Dragon</button> -->
     </div>
 
     <div class="popup account-logout">
       <h1 class="popup-title">You're Logged In As <span class="account-name">Guest</span>.</h1>
       <p class="popup-text">Please choose an option below.</p>
-      <button class="logout-close" onclick="toggleLogoutPopup()">Close</button>
+      <button onclick="toggleLogoutPopup()">Close</button>
       <div class="spacer-vertical"></div>
-      <button class="logout-confirm" onclick="logout()">Logout</button>
+      <button class="confirm" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="popup account-missinginfo">
+      <h1 class="popup-title">Your Account Is Missing Info.</h1>
+      <p class="popup-text">Please enter the requested information below.</p>
+      <input class="account-missinginfo-displayName" type="text" placeholder="Display Name">
+      <input class="account-missinginfo-email" type="email" placeholder="Email">
+      <input class="account-missinginfo-photoURL" type="url" placeholder="Photo URL">
+      <input class="account-missinginfo-phoneNumber" type="tel" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="Phone Number">
+      <button class="confirm" onclick="submitMissingInfo()">Submit</button>
     </div>
 
     <script>
@@ -251,6 +278,16 @@
         });
       }
 
+      function submitMissingInfo() {
+        let importantData = {
+          displayName: user.displayName || document.getElementsByClassName("account-missinginfo-displayName")[0].value,
+          email: user.email || document.getElementsByClassName("account-missinginfo-email")[0].value,
+          photoURL: user.photoURL || document.getElementsByClassName("account-missinginfo-photoURL")[0].value,
+          phoneNumber: user.phoneNumber || document.getElementsByClassName("account-missinginfo-phoneNumber")[0].value
+        };
+        ref.users.child(user.uid).set(importantData);
+      }
+
       firebase.auth().getRedirectResult().then(function(result) {
         if (result.credential) { // Signed in
           // This gives you a Google Access Token. You can use it to access the Google API.
@@ -273,7 +310,15 @@
                 photoURL: userData.photoURL,
                 phoneNumber: userData.phoneNumber
               };
-              ref.users.child(userData.uid).set(importantData);
+              if (!importantData.displayName || !importantData.email || !importantData.photoURL || importantData.phoneNumber) {
+                if (!importantData.displayName) document.getElementsByClassName("account-missinginfo-displayName")[0].style.display = "block";
+                if (!importantData.email) document.getElementsByClassName("account-missinginfo-email")[0].style.display = "block";
+                if (!importantData.photoURL) document.getElementsByClassName("account-missinginfo-photoURL")[0].style.display = "block";
+                if (!importantData.phoneNumber) document.getElementsByClassName("account-missinginfo-phoneNumber")[0].style.display = "block";
+                toggle(document.getElementsByClassName("account-missinginfo")[0], "popup-active");
+              } else {
+                ref.users.child(userData.uid).set(importantData);
+              }
             }
           });
         } else { // Signed out
