@@ -123,8 +123,8 @@
       .popup button {
         display: flex;
         background-color: rgb(255, 255, 255);
-        width: 60%;
-        padding: 10px;
+        width: 40%;
+        padding: 15px 10px;
         border: none;
         border-radius: 20px;
         box-shadow: 0px 0px 5px 5px rgba(200, 200, 200, 0.25);
@@ -132,6 +132,14 @@
         align-items: center;
         justify-content: center;
         transition: box-shadow 0.5s, background-color 0.5s;
+      }
+      .account-login button {
+        width: 60%;
+        padding: 10px;
+      }
+      .popup button.logout-confirm {
+        background-color: rgb(15, 125, 210);
+        color: rgb(255, 255, 255);
       }
       .popup button:hover {
         cursor: pointer;
@@ -157,7 +165,7 @@
       <img class="header-logo" src="resources/logo.png">
       <h1 class="header-text">ReChat</h1>
       <div class="header-options">
-        <img class="account-image" src="resources/account.png">
+        <img class="account-image" src="resources/account.png" onclick="toggleLogoutPopup()">
       </div>
     </div>
 
@@ -180,6 +188,14 @@
       <!-- <button class="login-dragon" onclick="login('Dragon')"><img src="resources/logo-dragon.png">Login with Dragon</button> -->
     </div>
 
+    <div class="popup account-logout">
+      <h1 class="popup-title">You're Logged In As <span class="account-name">Guest</span>.</h1>
+      <p class="popup-text">Please choose an option below.</p>
+      <button class="logout-cancel" onclick="toggleLogoutPopup()">Cancel</button>
+      <div class="spacer-vertical"></div>
+      <button class="logout-confirm" onclick="logout()">Logout</button>
+    </div>
+
     <script>
 
       // Firebase setup:
@@ -198,18 +214,17 @@
         users: database.ref("users")
       };
 
+      let user = {};
+
       function login(method) {
         switch (method) {
           case "Google":
-            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
-              .then(function() {
-                let provider = new firebase.auth.GoogleAuthProvider();
-                firebase.auth().signInWithRedirect(provider);
-              }).catch(function(error) {
-                // Handle Errors here.
-                var errorCode = error.code;
-                var errorMessage = error.message;
-              });
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(function() {
+              let provider = new firebase.auth.GoogleAuthProvider();
+              firebase.auth().signInWithRedirect(provider);
+            }).catch(function(error) {
+              console.error(error);
+            });
           break;
           case "Dragon":
 
@@ -217,30 +232,44 @@
         }
       }
 
+      function logout() {
+        firebase.auth().signOut().then(function() {
+          toggleLogoutPopup();
+
+          user = {};
+
+          document.getElementsByClassName("account-image")[0].src = "resources/account.png";
+          document.getElementsByClassName("account-name")[0].innerText = "Guest";
+        }).catch(function(error) {
+          console.error(error);
+        });
+      }
+
       firebase.auth().getRedirectResult().then(function(result) {
         if (result.credential) { // Signed in
           // This gives you a Google Access Token. You can use it to access the Google API.
           var token = result.credential.accessToken;
           // The signed-in user info.
-          var user = result.user;
+          let userData = result.user;
           console.log(result);
           console.log(token);
-          console.log(user);
-          document.getElementsByClassName("account-image")[0].src = user.photoURL;
+          console.log(userData);
+          user = userData;
+
+          document.getElementsByClassName("account-image")[0].src = userData.photoURL;
+          document.getElementsByClassName("account-name")[0].innerText = userData.displayName;
         } else { // Signed out
           toggle(document.getElementsByClassName("account-login")[0], "popup-active");
           toggle(document.getElementsByClassName("cover")[0], "cover-active");
         }
       }).catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        // The email of the user's account used.
-        var email = error.email;
-        // The firebase.auth.AuthCredential type that was used.
-        var credential = error.credential;
-        // ...
+        console.error(error);
       });
+
+      function toggleLogoutPopup() {
+        toggle(document.getElementsByClassName("account-logout")[0], "popup-active");
+        toggle(document.getElementsByClassName("cover")[0], "cover-active");
+      }
 
       function toggle(el, cl) {
         if (el.classList.contains(cl)) {
