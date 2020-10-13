@@ -30,6 +30,14 @@
         font-size: 16pt;
         font-weight: 300;
       }
+      img {
+        user-drag: none;
+        -webkit-user-drag: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+      }
 
       .header {
         display: flex;
@@ -148,6 +156,9 @@
       .popup button:active {
         background-color: rgb(240, 240, 240);
       }
+      .popup button.logout-confirm:active {
+        background-color: rgb(0, 110, 195);
+      }
       .popup button:focus {
         outline: none;
       }
@@ -253,6 +264,18 @@
 
           document.getElementsByClassName("account-image")[0].src = userData.photoURL;
           document.getElementsByClassName("account-name")[0].innerText = userData.displayName;
+          ref.users.child(userData.uid).once(function(data) {
+            let d = data.val();
+            if (d === null) {
+              let importantData = {
+                displayName: userData.displayName,
+                email: userData.email,
+                photoURL: userData.photoURL,
+                phoneNumber: userData.phoneNumber
+              };
+              ref.users.child(userData.uid).set(importantData);
+            }
+          });
         } else { // Signed out
           toggle(document.getElementsByClassName("account-login")[0], "popup-active");
           toggle(document.getElementsByClassName("cover")[0], "cover-active");
