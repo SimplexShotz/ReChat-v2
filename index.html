@@ -310,7 +310,7 @@
                 photoURL: userData.photoURL,
                 phoneNumber: userData.phoneNumber
               };
-              if (!importantData.displayName || !importantData.email || !importantData.photoURL || importantData.phoneNumber) {
+              if (!importantData.displayName || !importantData.email || !importantData.photoURL || !importantData.phoneNumber) {
                 if (!importantData.displayName) document.getElementsByClassName("account-missinginfo-displayName")[0].style.display = "block";
                 if (!importantData.email) document.getElementsByClassName("account-missinginfo-email")[0].style.display = "block";
                 if (!importantData.photoURL) document.getElementsByClassName("account-missinginfo-photoURL")[0].style.display = "block";
