@@ -303,7 +303,7 @@
           document.getElementsByClassName("account-name")[0].innerText = userData.displayName;
           ref.users.child(userData.uid).once("value", function(data) {
             let d = data.val();
-            if (d === null) {
+            if (d === null || !d.displayName || !d.email || !d.photoURL || !d.phoneNumber) {
               let importantData = {
                 displayName: userData.displayName,
                 email: userData.email,
