@@ -234,12 +234,7 @@
 
       function logout() {
         firebase.auth().signOut().then(function() {
-          toggleLogoutPopup();
-
-          user = {};
-
-          document.getElementsByClassName("account-image")[0].src = "resources/account.png";
-          document.getElementsByClassName("account-name")[0].innerText = "Guest";
+          location.reload();
         }).catch(function(error) {
           console.error(error);
         });
