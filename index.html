@@ -286,6 +286,7 @@
           phoneNumber: user.phoneNumber || document.getElementsByClassName("account-missinginfo-phoneNumber")[0].value
         };
         ref.users.child(user.uid).set(importantData);
+        toggle(document.getElementsByClassName("account-missinginfo")[0], "popup-active");
       }
 
       firebase.auth().getRedirectResult().then(function(result) {
